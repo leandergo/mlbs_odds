@@ -6,7 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier, NearestNeighbors
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 import pdb
 
-mlb_df = pd.read_csv('/Users/Leander/Desktop/Projects/mlbs_odds/oddsDataMLB.csv')
+mlb_df = pd.read_csv('oddsDataMLB.csv')
 mlb_df = mlb_df.drop(['parkName', 'oppMoneyLine', 'oppRunLine', 'oppRunLineOdds', 'runLineOdds', 'runLine', 'projectedRuns', 'runDif', 'overOdds', 'underOdds'], axis=1)
 mlb_df['date'] = pd.to_datetime(mlb_df['date'])
 mlb_df = mlb_df.sort_values(by='date', ascending=False)
