@@ -7,24 +7,29 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import pdb
 
 mlb_df = pd.read_csv('oddsDataMLB.csv')
-mlb_df = mlb_df.drop(['parkName', 'oppMoneyLine', 'oppRunLine', 'oppRunLineOdds', 'runLineOdds', 'runLine', 'projectedRuns', 'runDif', 'overOdds', 'underOdds'], axis=1)
+mlb_df = mlb_df.drop(['parkName', 'oppMoneyLine', 'oppRunLine', 'oppRunLineOdds', 'projectedRuns', 'runDif', 'overOdds', 'underOdds'], axis=1)
 mlb_df['date'] = pd.to_datetime(mlb_df['date'])
 mlb_df = mlb_df.sort_values(by='date', ascending=False)
 mlb_df['under'] = np.where(mlb_df['total'] < mlb_df['totalRuns'], 1, 0)
 mlb_df['over'] = np.where(mlb_df['total'] > mlb_df['totalRuns'], 1, 0)
 mlb_df['push'] = np.where(mlb_df['total'] == mlb_df['totalRuns'], 1, 0)
 
+#Try incorporating the odds of the run line
+mlb_df = mlb_df.dropna()
 def odds_to_prob(odd):
-    return abs(odd) / (abs(odd) + 100)
-
+    if odd > 0:
+        return 100 / (odd + 100)
+    else:
+        return abs(odd) / (abs(odd) + 100)
 
 mlb_df['percent'] = mlb_df['moneyLine'].apply(odds_to_prob).round(3)
 mlb_df = mlb_df.drop(['moneyLine'], axis=1)
+mlb_df['linePercent'] = mlb_df['runLineOdds'].apply(odds_to_prob).round(3)
+mlb_df = mlb_df.drop(['runLineOdds'], axis=1)
 mlb_df['total_standard'] = ((mlb_df['total'] - mlb_df['total'].mean()) / mlb_df['total'].std()).round(3)
 
-
 # Splitting the data into training and testing sets
-features = ['total_standard', 'percent']
+features = ['total', 'percent', 'linePercent']
 target = ['under']
 
 for seasons in [2018, 2019, 2021]:
